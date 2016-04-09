@@ -287,14 +287,16 @@ def window():
     def c_div():
         global x
         global zeta
-        zeta=x+'÷'
+        zeta=zeta+'÷'
         x=x+'/'
         display(zeta)
+        default(x)
     #button to exit program
     def Exit():
         alpha.destroy()
         sys.exit
     #backspace or delete button
+    #index in a dictionary for deleting values
     def back():
         global x
         global zeta
@@ -350,8 +352,8 @@ def window():
     def log():
         global x
         global zeta
-        x=x+'log'
-        zeta=zeta+'log'
+        x=x+"math.log10("
+        zeta=zeta+'log₁₀('
         display(zeta)
         default(x)
     #raise something to a power. ex. 2^3
@@ -397,6 +399,28 @@ def window():
         x=x+"x"
         display(zeta)
         default(x)
+    def c_pi():
+        global x
+        global zeta
+        zeta=zeta+"π"
+        x=x+str(round(math.pi,4))
+        display(zeta)
+        default(x)
+    def more_trig():
+        edisplay("L(・o・)」")
+        idisplay("Trig Functions+etc!")
+        alpha.geometry('850x640+170+25')
+    def less_trig():
+        edisplay("L(・o・)」")
+        idisplay("Back to Normal!")
+        alpha.geometry('850x480+210+35')
+    def c_sin():
+        global x
+        global zeta
+        x=x+"math.sin((math.pi/180)*"
+        zeta=zeta+"sin("
+        display(zeta)
+        default(x)
     ####################################################################
     #adding number buttons for calculator
     button_1=Button(alpha,text='1',command = c_1,height=3,width=5).place(x=300+xfix,y=200)
@@ -423,22 +447,31 @@ def window():
     button_clear=Button(alpha,text='Clear',command=clear,height=3,width=10).place(x=195+xfix,y=260)
     button_exit=Button(alpha,text='Exit',command=Exit,height=3,width=10).place(x=195+xfix,y=320)
     button_more=Button(alpha,text='More',command=more,height=3,width=10).place(x=195+xfix,y=380)
+    button_mtrig=Button(alpha,text='Trig',command=more_trig,height=3,width=6).place(x=490,y=170+120)
+    button_ltrig=Button(alpha,text=' ↑ ',command=less_trig,height=3,width=6).place(x=430,y=170+320)
     #####################################################################
     #more buttons
     button_lftprnthsis=Button(alpha,text='(',command=lft,height=3,width=6).place(x=430,y=110)
     button_rghtprnthsis=Button(alpha,text=')',command=rht,height=3,width=6).place(x=490,y=110)
     button_power=Button(alpha,text='^',command=power,height=3,width=6).place(x=430,y=170)
-    button_log=Button(alpha,text='log',command=log,height=3,width=6).place(x=490,y=170)
+    button_log=Button(alpha,text='log₁₀',command=log,height=3,width=6).place(x=490,y=170)
     button_less=Button(alpha,text='Less',command=less,height=3,width=6).place(x=430,y=50)
     button_help=Button(alpha,text='Help',command=_help,height=3,width=6).place(x=490,y=50)
     button_sqr=Button(alpha,text='x²',command=c_sqr,height=3,width=6).place(x=490,y=170+60)
     button_sqrt=Button(alpha,text='√x',command=c_sqrt,height=3,width=6).place(x=430,y=170+60)
+    button_pi=Button(alpha,text='π',command=c_pi,height=3,width=6).place(x=430,y=170+120)
     ######################################################################
+    #EVEN MORE BUTTONS
     button_func=Button(alpha,text="f(x)=",command=func,height=3,width=8).place(x=600,y=50)
     button_switch=Button(alpha,text="Graph function",command=graph, height=3,width=15).place(x=690,y=50)
     button_var=Button(alpha,text="x",command=c_var, height=3,width=15).place(x=690,y=120)
     coordlist=[]
     more()
+    #########################################################################
+    #trig buttons
+    button_sin=Button(alpha,text='sin',command = c_sin,height=3,width=5).place(x=350,y=170+320)
+###############################################################################
+#restart program (ie. to use graph again)
     def rest():
         python = sys.executable
         os.execl(python, python, * sys.argv)
@@ -447,7 +480,13 @@ def window():
             if answer.lower().strip() in "y yes".split():
                 restart_program()
     #canvus_1 = Canvas(alpha,height=270,width=230,bg='green')
+#############################################################################
+#graphing function
     def grapher():
+        try:
+            canvus_1.destroy()
+        except:
+            pass
         canvus_1 = Canvas(alpha,height=230,width=230,bg='white')
         global x
         global zeta
@@ -455,7 +494,16 @@ def window():
         for t in range(0,(231*factor)):
             
             y=list(x)
-            for i in range(0,len(x)):
+#############################################################################
+            #replace x's with values
+            for ment in range(1,len(y)):
+                if y[ment]=="x":
+                    if y[ment-1].isdigit()==True:
+                        y.insert(ment,"*")
+            #if t<20:    
+                #print(y)
+            #change x's into t's
+            for i in range(0,len(y)):
                 if y[i]=="x":
                     
                     ban=str(((t)-115))
@@ -468,12 +516,12 @@ def window():
                         y.insert(i+2,")")
                     else:
                         y[i]=str(ban)
-            y.insert(0,"(")
-            y.append(")")
                     
             y=''.join(y)
 
             y=str(y)
+#############################################################################
+            #plug in for the given values 
             try:
                 #IMPORTANT VERTICAL STRETCH IS WHATEVER multiplies eval(y)
                 d=(eval(y)*1)+(230/2)
@@ -488,19 +536,24 @@ def window():
                 coordlist.append(t)
                 coordlist.append(d)
             except:
-                global zeta
-            
+                pass
+################################################################################
+        #make points (microscopic lines) on the canvas to graph the solution
         for i in range(0,231):
             try:
                 canvus_1.create_line(coordlist[(2*i)],coordlist[(2*i)+1],(coordlist[2*i]+1),(coordlist[(2*i)+1]+1))
             except:
                 global zeta
+###################################################################################
+        #x and y axis
         canvus_1.create_line((230/2),0,(230/2),230)
         canvus_1.create_line(0,(230/2),230,(230/2))
+        #############################
+        #creating the canvas
         canvus_1.place(x=580,y=200)
         edisplay("(☆^ー^☆)")
         idisplay("Graphed!")
-    
+######################################################################################
     button_switch=Button(alpha,text="Graph function",command=grapher, height=3,width=15).place(x=690,y=50)
     button_restart=Button(alpha,text="Reset",command=rest, height=3,width=8).place(x=600,y=60+60)
     #########################################################################
